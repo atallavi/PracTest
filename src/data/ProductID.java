@@ -1,10 +1,17 @@
 package data;
 
+import exceptions.InvalidProductID;
+
 final public class ProductID {
 
     private final String UPC;
 
-    public ProductID(String upc) { UPC = upc; }
+    public ProductID(String upc) throws InvalidProductID {
+        if(upc == null) throw new InvalidProductID("Product ID can not be null");
+        if(!isValid(upc)) throw new InvalidProductID("Product ID must be 13 digits");
+        UPC = upc; }
+
+    private boolean isValid(String upc) { return upc.matches( "[0-9]{13}" ); }
 
     public String getUPC() {
         return UPC;

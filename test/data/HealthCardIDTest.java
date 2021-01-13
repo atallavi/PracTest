@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 class HealthCardIDTest {
-
     @Test
     void nullHealthCardFormat() throws InvalidHealthCard {
         Throwable exception = assertThrows(InvalidHealthCard.class,
@@ -26,7 +25,4 @@ class HealthCardIDTest {
     void correctHealthCardFormat() throws InvalidHealthCard {
         HealthCardID hID = new HealthCardID( "BBBBBBAA123456789012345678" );
     }
-
-    //"/[B]{6}+[A-Z][2]+[0-9]{18}/"
-
 }
