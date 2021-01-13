@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 public class DigitalSignature {
 
+
     private final byte[] digitalSignature;
 
     public DigitalSignature(byte[] digitalSignature) {

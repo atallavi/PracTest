@@ -1,28 +1,29 @@
 package data;
 
-import exceptions.InvalidHealthCard;
+import exceptions.HealthCardException;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 
 class HealthCardIDTest {
     @Test
-    void nullHealthCardFormat() throws InvalidHealthCard {
-        Throwable exception = assertThrows(InvalidHealthCard.class,
+    void nullHealthCardFormat() throws HealthCardException {
+        Throwable exception = assertThrows(HealthCardException.class,
                 () -> {
                     HealthCardID hID = new HealthCardID( null );
                 });
     }
     @Test
-    void invalidHealthCardFormat() throws InvalidHealthCard {
-        Throwable exception = assertThrows(InvalidHealthCard.class,
+    void invalidHealthCardFormat() throws HealthCardException {
+        Throwable exception = assertThrows(HealthCardException.class,
                 () -> {
                     HealthCardID hID = new HealthCardID( "BADCODE01" );
                 });
     }
     @Test
-    void correctHealthCardFormat() throws InvalidHealthCard {
+    void correctHealthCardFormat() throws HealthCardException {
         HealthCardID hID = new HealthCardID( "BBBBBBAA123456789012345678" );
     }
 }

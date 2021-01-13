@@ -1,13 +1,13 @@
 package data;
 
-import exceptions.InvalidHealthCard;
+import exceptions.HealthCardException;
 
 final public class HealthCardID  {
     private final String personalID;
 
-    public HealthCardID(String code) throws InvalidHealthCard {
-        if (code==null) throw new InvalidHealthCard("Health Card can not be null");
-        if (!isValid( code )) throw new InvalidHealthCard("Format expected");
+    public HealthCardID(String code) throws HealthCardException {
+        if (code==null) throw new HealthCardException("Health Card can not be null");
+        if (!isValid( code )) throw new HealthCardException("Format expected");
         this.personalID = code;
     }
 
