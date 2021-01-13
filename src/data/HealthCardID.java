@@ -1,10 +1,18 @@
 package data;
 
-final public class HealthCardID {
+import exceptions.InvalidHealthCard;
+
+final public class HealthCardID  {
     private final String personalID;
 
-    public HealthCardID(String code) {
+    public HealthCardID(String code) throws InvalidHealthCard {
+        if (code==null) throw new InvalidHealthCard("Health Card can not be null");
+        if (!isValid( code )) throw new InvalidHealthCard("Format expected");
         this.personalID = code;
+    }
+
+    private boolean isValid(String code){
+        return code.matches( "[B]{6}+[A-Z]{2}+[0-9]{18}" );
     }
 
     public String getPersonalID() {
