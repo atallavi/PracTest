@@ -8,7 +8,6 @@ import services.HealthNationalService;
 import services.ScheduledVisitAgenda;
 
 import java.net.ConnectException;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -38,16 +37,22 @@ public class ConsultationTerminal {
 
     public void initPrescriptionEdition()
             throws AnyCurrentPrescriptionException, NotFinishedTreatmentException {
+        if(medicalPrescription.getPrescDate() != null) {
+            /* !!! Not sure !!! */
+            throw new AnyCurrentPrescriptionException("Medical Prescription already on course.");
+        }
+        if(new Date().before(medicalPrescription.getEndDate())) {
+            throw new NotFinishedTreatmentException("Medical Prescription not finished");
+        }
         psSearchResults = null;
         ps = null;
-
     }
 
     public void searchForProducts(String keyWord)
             throws AnyKeyWordMedicineException, ConnectException {
         this.psSearchResults = hns.getProductByKW(keyWord);
         System.out.println("Search results for key word " + keyWord  + ":");
-        for( ProductSpecification p: psSearchResults) {
+        for(ProductSpecification p: psSearchResults) {
             System.out.println(p);
         }
     }
@@ -81,10 +86,10 @@ public class ConsultationTerminal {
     public void sendePrescription()
             throws ConnectException, NotValidePrescription,
             eSignatureException, NotCompletedMedicalPrescription {
-
+        hns.sendePrescription(medicalPrescription);
     }
 
     public void printePresc() throws PrintingException {
-
+        System.out.println(medicalPrescription);
     }
 }
