@@ -1,30 +1,49 @@
 package medicalconsultation;
 
 import data.ProductID;
+import exceptions.IncorrectTakingGuidelinesException;
 
 public class MedicalPrescriptionLine {
     private ProductID productID;
     private TakingGuideline tgl;
 
-    public MedicalPrescriptionLine(ProductID prodID, String[] instruc) {
+    public MedicalPrescriptionLine(ProductID prodID, String[] instructions) throws IncorrectTakingGuidelinesException {
         this.productID = prodID;
-        dayMoment dm = obtainDayMoment( instruc[0] );
-        FqUnit fqU = obtainFqUnit( instruc[4] );
-        tgl = new TakingGuideline( dm, Float.parseFloat( instruc[1] ),instruc[2], Float.parseFloat( instruc[3] ),
-                Float.parseFloat( instruc[4] ), fqU  );
+
+        dayMoment dm = obtainDayMoment( instructions[0] );
+        FqUnit fqU = obtainFqUnit( instructions[4] );
+
+        tgl = new TakingGuideline( dm,
+                Float.parseFloat( instructions[1] ),
+                instructions[2],
+                Float.parseFloat( instructions[3] ),
+                Float.parseFloat( instructions[4] ),
+                fqU  );
     }
 
-    private dayMoment obtainDayMoment(String s) {
+    public ProductID getProductID() {
+        return productID;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MedicalPrescriptionLine mpl = (MedicalPrescriptionLine) o;
+        return this.getProductID().equals( mpl.getProductID() );
+    }
+
+    private dayMoment obtainDayMoment(String s) throws IncorrectTakingGuidelinesException{
         for (dayMoment c : dayMoment.values()) {
             if(c.name().equals( s )) return c;
         }
-        return dayMoment.AFTERBREAKFAST;
+        throw new IncorrectTakingGuidelinesException( "" );
     }
-    private FqUnit obtainFqUnit(String s){
+    private FqUnit obtainFqUnit(String s) throws IncorrectTakingGuidelinesException{
         for(FqUnit f : FqUnit.values()) {
             if(f.name().equals( s )) return f;
         }
-        return FqUnit.DAY;
+        throw new IncorrectTakingGuidelinesException( "" );
     }
 }
 

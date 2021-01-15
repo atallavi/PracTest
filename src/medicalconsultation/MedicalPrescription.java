@@ -7,6 +7,7 @@ import exceptions.IncorrectTakingGuidelinesException;
 import exceptions.ProductNotInPrescription;
 
 import java.util.Date;
+import java.util.HashSet;
 
 /**
  * Package for the classes involved in the use case Suply next dispensing
@@ -18,13 +19,14 @@ public class MedicalPrescription {
     private Date endDate;
     private HealthCardID hcID; // the healthcard ID of the patient
     private DigitalSignature eSign; // the eSignature of the doctor
+    private HashSet<MedicalPrescriptionLine> lines;
 
     public MedicalPrescription() {
         /* Maybe empty constructor?*/
     }
 
     public void addLine(ProductID prodID, String[] instruc) throws IncorrectTakingGuidelinesException {
-
+            lines.add( new MedicalPrescriptionLine( prodID, instruc ) );
     }
 
     public void modifyLine(ProductID prodID, String[] instruct)
