@@ -43,4 +43,43 @@ public class MedicalPrescription {
 
     }
 
+    public void setPrescCode(int prescCode) {
+        this.prescCode = prescCode;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public void setPrescDate(Date prescDate) {
+        this.prescDate = prescDate;
+    }
+
+    public void seteSign(DigitalSignature eSign) {
+        this.eSign = eSign;
+    }
+
+    public void setHcID(HealthCardID hcID) {
+        this.hcID = hcID;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public Date getPrescDate() {
+        return prescDate;
+    }
+
+    public DigitalSignature geteSign() {
+        return eSign;
+    }
+
+    public HealthCardID getHcID() {
+        return hcID;
+    }
+
+    public int getPrescCode() {
+        return prescCode;
+    }
 }
