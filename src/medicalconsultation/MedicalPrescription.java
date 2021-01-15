@@ -19,13 +19,8 @@ public class MedicalPrescription {
     private HealthCardID hcID; // the healthcard ID of the patient
     private DigitalSignature eSign; // the eSignature of the doctor
 
-    public MedicalPrescription(int prescCode, Date prescDate, Date endDate,
-                               HealthCardID hcID, DigitalSignature eSign) {
-        this. prescCode = prescCode;
-        this.prescDate = prescDate;
-        this.endDate = endDate;
-        this.hcID = hcID;
-        this.eSign = eSign;
+    public MedicalPrescription() {
+        /* Maybe empty constructor?*/
     }
 
     public void addLine(ProductID prodID, String[] instruc) throws IncorrectTakingGuidelinesException {

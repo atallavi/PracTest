@@ -8,6 +8,7 @@ import services.HealthNationalService;
 import services.ScheduledVisitAgenda;
 
 import java.net.ConnectException;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class ConsultationTerminal {
             throws HealthCardException, NotValidePrescription, ConnectException {
         this.hcID = sva.getHealthCardID();
         this.medicalPrescription = hns.getePrescription(hcID);
-        System.out.println(medicalPrescription);
+        System.out.println("Medical Prescription downloaded from Health National Service.");
     }
 
     public void setScheduledVisitAgenda(ScheduledVisitAgenda sva){
@@ -38,6 +39,7 @@ public class ConsultationTerminal {
     public void initPrescriptionEdition()
             throws AnyCurrentPrescriptionException, NotFinishedTreatmentException {
         psSearchResults = null;
+        ps = null;
 
     }
 
@@ -60,13 +62,20 @@ public class ConsultationTerminal {
 
     public void enterMedicineGuidelines(String[] instruc)
             throws AnySelectedMedicineException, IncorrectTakingGuidelinesException {
-        
-
+        if (ps == null) {
+            throw new AnySelectedMedicineException("Product not selected.");
+        }
+        medicalPrescription.addLine(ps.getProductID(), instruc);
     }
 
     public void enterTreatmentEndingDate(Date date)
             throws IncorrectEndingDateException {
-
+        Date currentDate = new Date();
+        if (date.before(currentDate)) {
+            throw new IncorrectEndingDateException("Ending date can not be before current date");
+        }
+        medicalPrescription.setPrescDate(currentDate);
+        medicalPrescription.setEndDate(date);
     }
 
     public void sendePrescription()
