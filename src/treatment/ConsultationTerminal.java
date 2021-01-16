@@ -91,4 +91,12 @@ public class ConsultationTerminal {
     public void printePresc() throws PrintingException {
         System.out.println(medicalPrescription);
     }
+
+    public HealthCardID getHcID(){
+        return this.hcID;
+    }
+
+    public MedicalPrescription getMedicalPrescription() {
+        return this.medicalPrescription;
+    }
 }

@@ -6,39 +6,48 @@ import data.ProductID;
 import exceptions.*;
 import medicalconsultation.MedicalPrescription;
 import medicalconsultation.ProductSpecification;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import services.HealthNationalService;
+import services.ScheduledVisitAgenda;
 
 import java.math.BigDecimal;
 import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 public class ConsultationTerminalTest {
 
-    public class HealthNationalServiceImp implements HealthNationalService {
+    static ConsultationTerminal consultationTerminal;
+    static int defaultPrescCode = 1;
+    static String defaultPersonalID = "BBBBBBAA111111111111111111";
+
+    public static class HealthNationalServiceImp implements HealthNationalService {
+
 
         private List<ProductSpecification> prodList;
 
         @Override
         public MedicalPrescription getePrescription(HealthCardID hcID)
                 throws HealthCardException, NotValidePrescription, ConnectException {
-            if(hcID.getPersonalID() == null) {
+            if (hcID.getPersonalID() == null) {
                 throw new HealthCardException("Health Card ID code can not be null.");
             }
-            if(!HealthCardID.isValid(hcID.getPersonalID())) {
+            if (!HealthCardID.isValid(hcID.getPersonalID())) {
                 throw new HealthCardException("Format expected.");
             }
             MedicalPrescription medicalPrescription = new MedicalPrescription();
             medicalPrescription.setHcID(hcID);
-            medicalPrescription.setPrescCode(1); // ?
+            medicalPrescription.setPrescCode(defaultPrescCode); // ?
             return medicalPrescription;
         }
 
         @Override
         public List<ProductSpecification> getProductByKW(String keyWord)
                 throws AnyKeyWordMedicineException, ConnectException, InvalidProductID {
-            if(keyWord.equals("dummy keyword without results")) {
+            if (keyWord.equals("dummy keyword without results")) {
                 throw new AnyKeyWordMedicineException("No results found for \'" + keyWord + "\' key word.");
             }
             //Create 2 Product Specification dummies
@@ -75,4 +84,32 @@ public class ConsultationTerminalTest {
             return ePresc;
         }
     }
+
+    public static class ScheduledVisitAgendaImpl implements ScheduledVisitAgenda {
+
+        @Override
+        public HealthCardID getHealthCardID() throws HealthCardException {
+            return new HealthCardID(defaultPersonalID);
+        }
+    }
+
+    @BeforeAll
+    static void setup(){
+        consultationTerminal = new ConsultationTerminal();
+        consultationTerminal.setHealthNationalService(new HealthNationalServiceImp());
+        consultationTerminal.setScheduledVisitAgenda(new ScheduledVisitAgendaImpl());
+    }
+
+    @Test
+    void initRevisionTest() throws NotValidePrescription, HealthCardException, ConnectException {
+        consultationTerminal.initRevision();
+
+        int prescCode = consultationTerminal.getMedicalPrescription().getPrescCode();
+        HealthCardID hcID = consultationTerminal.getHcID();
+
+        assertEquals(defaultPrescCode, prescCode);
+        assertEquals(defaultPersonalID, hcID.getPersonalID());
+    }
+
+
 }
