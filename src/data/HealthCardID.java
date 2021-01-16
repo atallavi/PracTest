@@ -11,7 +11,7 @@ final public class HealthCardID  {
         this.personalID = code;
     }
 
-    private boolean isValid(String code){
+    public static boolean isValid(String code){
         return code.matches( "[B]{6}+[A-Z]{2}+[0-9]{18}" );
     }
 
