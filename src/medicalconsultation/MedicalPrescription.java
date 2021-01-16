@@ -22,7 +22,7 @@ public class MedicalPrescription {
     private HashSet<MedicalPrescriptionLine> lines;
 
     public MedicalPrescription() {
-        /* Maybe empty constructor?*/
+        lines = new HashSet<>();
     }
 
     public void addLine(ProductID prodID, String[] instruc) throws IncorrectTakingGuidelinesException {
