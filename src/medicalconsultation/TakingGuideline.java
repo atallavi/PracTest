@@ -7,6 +7,7 @@ public class TakingGuideline {
     private String instructions;
     private Posology posology;
 
+
     public TakingGuideline(dayMoment dM, float du, String i, float d, float f, FqUnit u) {
         this.dMoment = dM;
         this.duration = du;

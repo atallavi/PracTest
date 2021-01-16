@@ -9,20 +9,33 @@ public class MedicalPrescriptionLine {
 
     public MedicalPrescriptionLine(ProductID prodID, String[] instructions) throws IncorrectTakingGuidelinesException {
         this.productID = prodID;
-
-        dayMoment dm = obtainDayMoment( instructions[0] );
-        FqUnit fqU = obtainFqUnit( instructions[4] );
-
-        tgl = new TakingGuideline( dm,
-                Float.parseFloat( instructions[1] ),
+        if(checkInstructions( instructions ))
+        tgl = new TakingGuideline(dayMoment.valueOf( instructions[0] ),
+                Float.parseFloat(instructions[1]),
                 instructions[2],
                 Float.parseFloat( instructions[3] ),
                 Float.parseFloat( instructions[4] ),
-                fqU  );
+                FqUnit.valueOf( instructions[5] ) );
     }
 
     public ProductID getProductID() {
         return productID;
+    }
+
+    public void setGuidelines(String[] s) throws IncorrectTakingGuidelinesException {
+        if (checkInstructions( s ))
+        tgl.setDayMoment( dayMoment.valueOf( s[0]  ) );
+        tgl.setDuration( Float.parseFloat( s[1] ) );
+        tgl.setInstructions( s[2] );
+        tgl.setDose( Float.parseFloat( s[3] ) );
+        tgl.setFreq( Float.parseFloat( s[4] ) );
+        tgl.setFreqUnit( FqUnit.valueOf( s[5] ) );
+    }
+
+    private boolean checkInstructions(String[] instructions) throws IncorrectTakingGuidelinesException {
+        if ((6 < instructions.length) && instructions.length> 6) { throw new IncorrectTakingGuidelinesException("Instructions should be {'Daymoment', 'Duration, 'Instructions','Dose', 'Frequency', 'Frequency unit'}");}
+        for(String s : instructions ) { if (s == null) throw new IncorrectTakingGuidelinesException("Instructions can not be null"); }
+        return true;
     }
 
     @Override
@@ -33,17 +46,7 @@ public class MedicalPrescriptionLine {
         return this.getProductID().equals( mpl.getProductID() );
     }
 
-    private dayMoment obtainDayMoment(String s) throws IncorrectTakingGuidelinesException{
-        for (dayMoment c : dayMoment.values()) {
-            if(c.name().equals( s )) return c;
-        }
-        throw new IncorrectTakingGuidelinesException( "" );
-    }
-    private FqUnit obtainFqUnit(String s) throws IncorrectTakingGuidelinesException{
-        for(FqUnit f : FqUnit.values()) {
-            if(f.name().equals( s )) return f;
-        }
-        throw new IncorrectTakingGuidelinesException( "" );
-    }
+
+
 }
 

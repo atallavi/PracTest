@@ -7,6 +7,7 @@ import exceptions.IncorrectTakingGuidelinesException;
 import exceptions.ProductNotInPrescription;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 
 /**
@@ -19,23 +20,26 @@ public class MedicalPrescription {
     private Date endDate;
     private HealthCardID hcID; // the healthcard ID of the patient
     private DigitalSignature eSign; // the eSignature of the doctor
-    private HashSet<MedicalPrescriptionLine> lines;
+    private HashMap<ProductID, MedicalPrescriptionLine> lines;
 
     public MedicalPrescription() {
-        /* Maybe empty constructor?*/
+        lines = new HashMap<ProductID, MedicalPrescriptionLine>(  );
     }
 
     public void addLine(ProductID prodID, String[] instruc) throws IncorrectTakingGuidelinesException {
-            lines.add( new MedicalPrescriptionLine( prodID, instruc ) );
+            lines.put( prodID, new MedicalPrescriptionLine( prodID, instruc ) );
     }
 
     public void modifyLine(ProductID prodID, String[] instruct)
             throws ProductNotInPrescription, IncorrectTakingGuidelinesException {
+        if(!lines.containsKey(prodID )) {throw  new ProductNotInPrescription( prodID.toString() + "has no line created yet" );}
+        lines.get( prodID ).setGuidelines( instruct );
 
     }
 
     public void removeLine(ProductID prodID) throws ProductNotInPrescription{
-
+        if(!lines.containsKey(prodID )) {throw  new ProductNotInPrescription( prodID.toString() + "has no line created yet" );}
+        lines.remove( prodID );
     }
 
     public void setPrescCode(int prescCode) {
