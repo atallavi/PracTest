@@ -23,6 +23,8 @@ public class ConsultationTerminalTest {
     static ConsultationTerminal consultationTerminal;
     static int defaultPrescCode = 1;
     static String defaultPersonalID = "BBBBBBAA111111111111111111";
+    static String validKeyWord = "Corona";
+
 
     public static class HealthNationalServiceImp implements HealthNationalService {
 
@@ -47,7 +49,7 @@ public class ConsultationTerminalTest {
         @Override
         public List<ProductSpecification> getProductByKW(String keyWord)
                 throws AnyKeyWordMedicineException, ConnectException, InvalidProductID {
-            if (keyWord.equals("dummy keyword without results")) {
+            if (!keyWord.equals(validKeyWord)) {
                 throw new AnyKeyWordMedicineException("No results found for \'" + keyWord + "\' key word.");
             }
             //Create 2 Product Specification dummies
@@ -100,6 +102,7 @@ public class ConsultationTerminalTest {
         consultationTerminal.setScheduledVisitAgenda(new ScheduledVisitAgendaImpl());
     }
 
+
     @Test
     void initRevisionTest() throws NotValidePrescription, HealthCardException, ConnectException {
         consultationTerminal.initRevision();
@@ -111,5 +114,38 @@ public class ConsultationTerminalTest {
         assertEquals(defaultPersonalID, hcID.getPersonalID());
     }
 
+    @Test
+    void initPrescriptionEditionBeforeInitRevisionTest() {
+        ConsultationTerminal ct = new ConsultationTerminal();
+        assertThrows(AnyCurrentPrescriptionException.class, () -> ct.initPrescriptionEdition());
+    }
+
+
+    @Test
+    void initPrescriptionEditionTest() throws NotFinishedTreatmentException, AnyCurrentPrescriptionException {
+        consultationTerminal.initPrescriptionEdition();
+        assertEquals(defaultPrescCode, consultationTerminal.getMedicalPrescription().getPrescCode());
+        assertNull(consultationTerminal.getPs());
+        assertNull(consultationTerminal.getPsSearchResults());
+    }
+
+    @Test
+    void searchForProductsTest() throws ConnectException, InvalidProductID, AnyKeyWordMedicineException {
+        consultationTerminal.searchForProducts(validKeyWord);
+        List<ProductSpecification> expectedList = new ArrayList<>();
+        ProductSpecification ps1, ps2;
+        ps1 = new ProductSpecification(
+                new ProductID("1234567890123"),
+                new BigDecimal(10),
+                "Desc 1");
+        ps2 = new ProductSpecification(
+                new ProductID("9234567890123"),
+                new BigDecimal(20),
+                "Desc 2");
+        expectedList.add(ps1);
+        expectedList.add(ps2);
+
+        assertEquals(expectedList, consultationTerminal.getPsSearchResults());
+    }
 
 }

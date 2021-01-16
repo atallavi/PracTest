@@ -38,13 +38,13 @@ public class ConsultationTerminal {
     public void initPrescriptionEdition()
             throws AnyCurrentPrescriptionException, NotFinishedTreatmentException {
         if(medicalPrescription == null) {
-            throw new AnyCurrentPrescriptionException("Medical Prescription already on course.");
-        }
-        if(new Date().before(medicalPrescription.getEndDate())) {
+            throw new AnyCurrentPrescriptionException("Medical Prescription not initialized"); }
+        if(medicalPrescription.getEndDate() != null && new Date().before(medicalPrescription.getEndDate())) {
             throw new NotFinishedTreatmentException("Medical Prescription not finished");
         }
         psSearchResults = null;
         ps = null;
+        System.out.println("Prescription edition initialized.");
     }
 
     public void searchForProducts(String keyWord)
@@ -98,5 +98,13 @@ public class ConsultationTerminal {
 
     public MedicalPrescription getMedicalPrescription() {
         return this.medicalPrescription;
+    }
+
+    public ProductSpecification getPs() {
+        return ps;
+    }
+
+    public List<ProductSpecification> getPsSearchResults() {
+        return psSearchResults;
     }
 }
