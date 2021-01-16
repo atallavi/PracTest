@@ -37,8 +37,7 @@ public class ConsultationTerminal {
 
     public void initPrescriptionEdition()
             throws AnyCurrentPrescriptionException, NotFinishedTreatmentException {
-        if(medicalPrescription.getPrescDate() != null) {
-            /* !!! Not sure !!! */
+        if(medicalPrescription == null) {
             throw new AnyCurrentPrescriptionException("Medical Prescription already on course.");
         }
         if(new Date().before(medicalPrescription.getEndDate())) {
@@ -49,7 +48,7 @@ public class ConsultationTerminal {
     }
 
     public void searchForProducts(String keyWord)
-            throws AnyKeyWordMedicineException, ConnectException {
+            throws AnyKeyWordMedicineException, ConnectException, InvalidProductID {
         this.psSearchResults = hns.getProductByKW(keyWord);
         System.out.println("Search results for key word " + keyWord  + ":");
         for(ProductSpecification p: psSearchResults) {
