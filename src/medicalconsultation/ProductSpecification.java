@@ -43,4 +43,14 @@ public class ProductSpecification {
     public String toString() {
         return upcCode.toString() + "\nDescription: " + description + "\nPrice: " + price.toString();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ProductSpecification ps = (ProductSpecification) o;
+        return ps.getProductID().equals(upcCode)
+                && ps.getDescription().equals(description)
+                && ps.getPrice().equals(price);
+    }
 }

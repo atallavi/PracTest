@@ -14,7 +14,7 @@ public interface HealthNationalService {
         throws HealthCardException, NotValidePrescription, ConnectException;
 
     List<ProductSpecification> getProductByKW (String keyWord)
-        throws AnyKeyWordMedicineException, ConnectException;
+            throws AnyKeyWordMedicineException, ConnectException, InvalidProductID;
 
     ProductSpecification getProductSpecification(int opt)
         throws AnyMedicineSearchException, ConnectException;

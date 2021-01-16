@@ -37,19 +37,18 @@ public class ConsultationTerminal {
 
     public void initPrescriptionEdition()
             throws AnyCurrentPrescriptionException, NotFinishedTreatmentException {
-        if(medicalPrescription.getPrescDate() != null) {
-            /* !!! Not sure !!! */
-            throw new AnyCurrentPrescriptionException("Medical Prescription already on course.");
-        }
-        if(new Date().before(medicalPrescription.getEndDate())) {
+        if(medicalPrescription == null) {
+            throw new AnyCurrentPrescriptionException("Medical Prescription not initialized"); }
+        if(medicalPrescription.getEndDate() != null && new Date().before(medicalPrescription.getEndDate())) {
             throw new NotFinishedTreatmentException("Medical Prescription not finished");
         }
         psSearchResults = null;
         ps = null;
+        System.out.println("Prescription edition initialized.");
     }
 
     public void searchForProducts(String keyWord)
-            throws AnyKeyWordMedicineException, ConnectException {
+            throws AnyKeyWordMedicineException, ConnectException, InvalidProductID {
         this.psSearchResults = hns.getProductByKW(keyWord);
         System.out.println("Search results for key word " + keyWord  + ":");
         for(ProductSpecification p: psSearchResults) {
@@ -91,5 +90,21 @@ public class ConsultationTerminal {
 
     public void printePresc() throws PrintingException {
         System.out.println(medicalPrescription);
+    }
+
+    public HealthCardID getHcID(){
+        return this.hcID;
+    }
+
+    public MedicalPrescription getMedicalPrescription() {
+        return this.medicalPrescription;
+    }
+
+    public ProductSpecification getPs() {
+        return ps;
+    }
+
+    public List<ProductSpecification> getPsSearchResults() {
+        return psSearchResults;
     }
 }
