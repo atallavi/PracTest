@@ -13,6 +13,7 @@ import services.ScheduledVisitAgenda;
 import java.math.BigDecimal;
 import java.net.ConnectException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -134,6 +135,7 @@ public class ConsultationTerminalTest {
             NotValidePrescription, HealthCardException, ConnectException {
         consultationTerminal.initRevision();
         consultationTerminal.initPrescriptionEdition();
+
         assertEquals(defaultPrescCode, consultationTerminal.getMedicalPrescription().getPrescCode());
         assertNull(consultationTerminal.getPs());
         assertNull(consultationTerminal.getPsSearchResults());
@@ -145,12 +147,14 @@ public class ConsultationTerminalTest {
         List<ProductSpecification> expectedList = new ArrayList<>();
         expectedList.add(ps1);
         expectedList.add(ps2);
+
         assertEquals(expectedList, consultationTerminal.getPsSearchResults());
     }
 
     @Test
     void selectProductWithoutSearchTest() {
         ConsultationTerminal ct = new ConsultationTerminal();
+
         assertThrows(AnyMedicineSearchException.class, () -> ct.selectProduct(1));
     }
 
@@ -159,6 +163,7 @@ public class ConsultationTerminalTest {
             throws AnyMedicineSearchException, ConnectException, InvalidProductID, AnyKeyWordMedicineException {
         consultationTerminal.searchForProducts(validKeyWord);
         consultationTerminal.selectProduct(1);
+
         assertEquals(ps1, consultationTerminal.getPs());
     }
 
@@ -199,6 +204,60 @@ public class ConsultationTerminalTest {
         assertEquals(Float.parseFloat(instructions[3]), tgl.getDose());
         assertEquals(Float.parseFloat(instructions[4]), tgl.getFreq());
         assertEquals(FqUnit.valueOf(instructions[5]), tgl.getFreqUnit());
+    }
+
+    @Test
+    void enterMedicineGuidelinesWithoutProductSelectedTest()
+            throws ConnectException, InvalidProductID, AnyKeyWordMedicineException,
+            AnyMedicineSearchException, AnySelectedMedicineException, IncorrectTakingGuidelinesException,
+            NotFinishedTreatmentException, AnyCurrentPrescriptionException, HealthCardException, NotValidePrescription {
+        consultationTerminal.initRevision();
+        consultationTerminal.initPrescriptionEdition();
+        consultationTerminal.searchForProducts(validKeyWord);
+
+        String[] instructions = new String[6];
+        instructions[0] = "BEFOREDINNER";
+        instructions[1] = "10";
+        instructions[2] = "instructions text";
+        instructions[3] = "20";
+        instructions[4] = "30";
+        instructions[5] = "DAY";
+
+        assertThrows(AnySelectedMedicineException.class,
+                ()->consultationTerminal.enterMedicineGuidelines(instructions));
+    }
+
+    @Test
+    void enterTreatmentEndingDateTest()
+            throws NotFinishedTreatmentException, AnyCurrentPrescriptionException, NotValidePrescription,
+            HealthCardException, ConnectException, IncorrectEndingDateException {
+        consultationTerminal.initRevision();
+        consultationTerminal.initPrescriptionEdition();
+        Date date = new Date();
+        consultationTerminal.enterTreatmentEndingDate(date);
+
+        assertEquals(date, consultationTerminal.getMedicalPrescription().getEndDate());
+
+    }
+
+    @Test
+    void enterTreatmentEndingDatePastDayTest()
+            throws NotFinishedTreatmentException, AnyCurrentPrescriptionException, NotValidePrescription,
+            HealthCardException, ConnectException {
+        consultationTerminal.initRevision();
+        consultationTerminal.initPrescriptionEdition();
+        assertThrows(IncorrectEndingDateException.class,
+                () -> consultationTerminal.enterTreatmentEndingDate(new Date(0)));
+
+    }
+
+    @Test
+    void sendePrescriptionTest()
+            throws NotFinishedTreatmentException, AnyCurrentPrescriptionException, NotValidePrescription,
+            HealthCardException, ConnectException, eSignatureException, NotCompletedMedicalPrescription {
+        consultationTerminal.initRevision();
+        consultationTerminal.initPrescriptionEdition();
+        consultationTerminal.sendePrescription();
     }
 
 }
