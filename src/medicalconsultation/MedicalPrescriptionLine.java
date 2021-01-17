@@ -22,6 +22,10 @@ public class MedicalPrescriptionLine {
         return productID;
     }
 
+    public TakingGuideline getTakingGuideline(){
+        return tgl;
+    }
+
     public void setGuidelines(String[] s) throws IncorrectTakingGuidelinesException {
         if (checkInstructions( s ))
         tgl.setDayMoment( dayMoment.valueOf( s[0]  ) );
