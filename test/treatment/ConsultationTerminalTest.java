@@ -24,10 +24,31 @@ public class ConsultationTerminalTest {
     static int defaultPrescCode = 1;
     static String defaultPersonalID = "BBBBBBAA111111111111111111";
     static String validKeyWord = "Corona";
+    static ProductID validProductID, validProductID2;
+
+    static {
+        try {
+            validProductID = new ProductID("9234567890123");
+            validProductID2 = new ProductID("1234567890123");
+        } catch (InvalidProductID invalidProductID) {
+            invalidProductID.printStackTrace();
+        }
+    }
+
+    static ProductSpecification ps1 = new ProductSpecification(
+            validProductID,
+            new BigDecimal(10),
+            "Desc 1"
+    );
+
+    static ProductSpecification ps2 = new ProductSpecification(
+            validProductID2,
+            new BigDecimal(20),
+            "Desc 2"
+    );
 
 
     public static class HealthNationalServiceImp implements HealthNationalService {
-
 
         private List<ProductSpecification> prodList;
 
@@ -48,20 +69,11 @@ public class ConsultationTerminalTest {
 
         @Override
         public List<ProductSpecification> getProductByKW(String keyWord)
-                throws AnyKeyWordMedicineException, ConnectException, InvalidProductID {
+                throws AnyKeyWordMedicineException, ConnectException {
             if (!keyWord.equals(validKeyWord)) {
                 throw new AnyKeyWordMedicineException("No results found for \'" + keyWord + "\' key word.");
             }
-            //Create 2 Product Specification dummies
-            ProductSpecification ps1, ps2;
-            ps1 = new ProductSpecification(
-                    new ProductID("1234567890123"),
-                    new BigDecimal(10),
-                    "Desc 1");
-            ps2 = new ProductSpecification(
-                    new ProductID("9234567890123"),
-                    new BigDecimal(20),
-                    "Desc 2");
+            //Create a list with 2 Product Specification dummies
             prodList = new ArrayList<>();
             prodList.add(ps1);
             prodList.add(ps2);
@@ -69,18 +81,12 @@ public class ConsultationTerminalTest {
         }
 
         @Override
-        public ProductSpecification getProductSpecification(int opt)
-                throws AnyMedicineSearchException, ConnectException {
-            if (prodList == null) {
-                throw new AnyMedicineSearchException("Search not preformed.");
-            }
-
-            return prodList.get(opt);
+        public ProductSpecification getProductSpecification(int opt) {
+            return ps1;
         }
 
         @Override
-        public MedicalPrescription sendePrescription(MedicalPrescription ePresc)
-                throws ConnectException, NotValidePrescription, eSignatureException, NotCompletedMedicalPrescription {
+        public MedicalPrescription sendePrescription(MedicalPrescription ePresc) {
             byte[] digitalSignature = new byte[10];
             ePresc.seteSign(new DigitalSignature(digitalSignature));
             return ePresc;
@@ -122,7 +128,8 @@ public class ConsultationTerminalTest {
 
 
     @Test
-    void initPrescriptionEditionTest() throws NotFinishedTreatmentException, AnyCurrentPrescriptionException {
+    void initPrescriptionEditionTest() throws NotFinishedTreatmentException, AnyCurrentPrescriptionException, NotValidePrescription, HealthCardException, ConnectException {
+        consultationTerminal.initRevision();
         consultationTerminal.initPrescriptionEdition();
         assertEquals(defaultPrescCode, consultationTerminal.getMedicalPrescription().getPrescCode());
         assertNull(consultationTerminal.getPs());
@@ -133,19 +140,23 @@ public class ConsultationTerminalTest {
     void searchForProductsTest() throws ConnectException, InvalidProductID, AnyKeyWordMedicineException {
         consultationTerminal.searchForProducts(validKeyWord);
         List<ProductSpecification> expectedList = new ArrayList<>();
-        ProductSpecification ps1, ps2;
-        ps1 = new ProductSpecification(
-                new ProductID("1234567890123"),
-                new BigDecimal(10),
-                "Desc 1");
-        ps2 = new ProductSpecification(
-                new ProductID("9234567890123"),
-                new BigDecimal(20),
-                "Desc 2");
         expectedList.add(ps1);
         expectedList.add(ps2);
 
         assertEquals(expectedList, consultationTerminal.getPsSearchResults());
+    }
+
+    @Test
+    void selectProductWithoutSearchTest() {
+        ConsultationTerminal ct = new ConsultationTerminal();
+        assertThrows(AnyMedicineSearchException.class, () -> ct.selectProduct(1));
+    }
+
+    @Test
+    void selectProductTest() throws AnyMedicineSearchException, ConnectException, InvalidProductID, AnyKeyWordMedicineException {
+        consultationTerminal.searchForProducts(validKeyWord);
+        consultationTerminal.selectProduct(1);
+        assertEquals(ps1, consultationTerminal.getPs());
     }
 
 }
