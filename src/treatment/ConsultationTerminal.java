@@ -24,7 +24,7 @@ public class ConsultationTerminal {
             throws HealthCardException, NotValidePrescription, ConnectException {
         this.hcID = sva.getHealthCardID();
         this.medicalPrescription = hns.getePrescription(hcID);
-        System.out.println("Medical Prescription downloaded from Health National Service.");
+        System.out.println("\tMedical Prescription downloaded from Health National Service.");
     }
 
     public void setScheduledVisitAgenda(ScheduledVisitAgenda sva){
@@ -44,13 +44,13 @@ public class ConsultationTerminal {
         }
         psSearchResults = null;
         ps = null;
-        System.out.println("Prescription edition initialized.");
+        System.out.println("\tPrescription edition initialized.");
     }
 
     public void searchForProducts(String keyWord)
             throws AnyKeyWordMedicineException, ConnectException, InvalidProductID {
         this.psSearchResults = hns.getProductByKW(keyWord);
-        System.out.println("Search results for key word " + keyWord  + ":");
+        System.out.println("\tSearch results for key word " + keyWord  + ":");
         for(ProductSpecification p: psSearchResults) {
             System.out.println(p);
         }
@@ -62,6 +62,8 @@ public class ConsultationTerminal {
             throw new AnyMedicineSearchException("Product specification search not preformed.");
         }
         this.ps = hns.getProductSpecification(option);
+        System.out.println("\tSelected option number " + option + ".");
+        System.out.println(ps);
     }
 
     public void enterMedicineGuidelines(String[] instruc)
@@ -70,6 +72,8 @@ public class ConsultationTerminal {
             throw new AnySelectedMedicineException("Product not selected.");
         }
         medicalPrescription.addLine(ps.getProductID(), instruc);
+        System.out.println("\tInstructions entered: ");
+        System.out.println(instruc);
     }
 
     public void enterTreatmentEndingDate(Date date)

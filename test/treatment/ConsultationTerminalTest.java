@@ -4,9 +4,7 @@ import data.DigitalSignature;
 import data.HealthCardID;
 import data.ProductID;
 import exceptions.*;
-import medicalconsultation.MedicalPrescription;
-import medicalconsultation.ProductSpecification;
-import org.junit.jupiter.api.BeforeAll;
+import medicalconsultation.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import services.HealthNationalService;
@@ -131,7 +129,9 @@ public class ConsultationTerminalTest {
 
 
     @Test
-    void initPrescriptionEditionTest() throws NotFinishedTreatmentException, AnyCurrentPrescriptionException, NotValidePrescription, HealthCardException, ConnectException {
+    void initPrescriptionEditionTest()
+            throws NotFinishedTreatmentException, AnyCurrentPrescriptionException,
+            NotValidePrescription, HealthCardException, ConnectException {
         consultationTerminal.initRevision();
         consultationTerminal.initPrescriptionEdition();
         assertEquals(defaultPrescCode, consultationTerminal.getMedicalPrescription().getPrescCode());
@@ -155,7 +155,8 @@ public class ConsultationTerminalTest {
     }
 
     @Test
-    void selectProductTest() throws AnyMedicineSearchException, ConnectException, InvalidProductID, AnyKeyWordMedicineException {
+    void selectProductTest()
+            throws AnyMedicineSearchException, ConnectException, InvalidProductID, AnyKeyWordMedicineException {
         consultationTerminal.searchForProducts(validKeyWord);
         consultationTerminal.selectProduct(1);
         assertEquals(ps1, consultationTerminal.getPs());
@@ -166,6 +167,38 @@ public class ConsultationTerminalTest {
         consultationTerminal.searchForProducts(validKeyWord);
         assertThrows(AnyMedicineSearchException.class,
                 () -> consultationTerminal.selectProduct(3));
+    }
+
+    @Test
+    void enterMedicineGuidelinesTest()
+            throws ConnectException, InvalidProductID, AnyKeyWordMedicineException,
+            AnyMedicineSearchException, AnySelectedMedicineException, IncorrectTakingGuidelinesException,
+            NotFinishedTreatmentException, AnyCurrentPrescriptionException, HealthCardException, NotValidePrescription {
+
+        consultationTerminal.initRevision();
+        consultationTerminal.initPrescriptionEdition();
+        consultationTerminal.searchForProducts(validKeyWord);
+        consultationTerminal.selectProduct(1);
+
+        String[] instructions = new String[6];
+        instructions[0] = "BEFOREDINNER";
+        instructions[1] = "10";
+        instructions[2] = "instructions text";
+        instructions[3] = "20";
+        instructions[4] = "30";
+        instructions[5] = "DAY";
+
+        consultationTerminal.enterMedicineGuidelines(instructions);
+        ProductID pID = consultationTerminal.getPs().getProductID();
+        MedicalPrescriptionLine mpl = consultationTerminal.getMedicalPrescription().getMedicalPrescriptionLine(pID);
+        TakingGuideline tgl = mpl.getTakingGuideline();
+
+        assertEquals(dayMoment.valueOf(instructions[0]), tgl.getDayMoment());
+        assertEquals(Float.parseFloat(instructions[1]), tgl.getDuration());
+        assertEquals(instructions[2], tgl.getInstructions());
+        assertEquals(Float.parseFloat(instructions[3]), tgl.getDose());
+        assertEquals(Float.parseFloat(instructions[4]), tgl.getFreq());
+        assertEquals(FqUnit.valueOf(instructions[5]), tgl.getFreqUnit());
     }
 
 }

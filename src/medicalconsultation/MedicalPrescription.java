@@ -42,6 +42,10 @@ public class MedicalPrescription {
         lines.remove( prodID );
     }
 
+    public MedicalPrescriptionLine getMedicalPrescriptionLine(ProductID pID) {
+        return lines.get(pID);
+    }
+
     public void setPrescCode(int prescCode) {
         this.prescCode = prescCode;
     }
