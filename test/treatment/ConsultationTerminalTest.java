@@ -7,6 +7,7 @@ import exceptions.*;
 import medicalconsultation.MedicalPrescription;
 import medicalconsultation.ProductSpecification;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import services.HealthNationalService;
 import services.ScheduledVisitAgenda;
@@ -20,13 +21,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ConsultationTerminalTest {
 
-    static ConsultationTerminal consultationTerminal;
-    static int defaultPrescCode = 1;
-    static String defaultPersonalID = "BBBBBBAA111111111111111111";
-    static String validKeyWord = "Corona";
-    static ProductID validProductID, validProductID2;
-
-    static {
+    ConsultationTerminal consultationTerminal;
+    int defaultPrescCode = 1;
+    String defaultPersonalID = "BBBBBBAA111111111111111111";
+    String validKeyWord = "Corona";
+    ProductID validProductID, validProductID2;
+    {
         try {
             validProductID = new ProductID("9234567890123");
             validProductID2 = new ProductID("1234567890123");
@@ -35,20 +35,21 @@ public class ConsultationTerminalTest {
         }
     }
 
-    static ProductSpecification ps1 = new ProductSpecification(
+
+    ProductSpecification ps1 = new ProductSpecification(
             validProductID,
             new BigDecimal(10),
             "Desc 1"
     );
 
-    static ProductSpecification ps2 = new ProductSpecification(
+    ProductSpecification ps2 = new ProductSpecification(
             validProductID2,
             new BigDecimal(20),
             "Desc 2"
     );
 
 
-    public static class HealthNationalServiceImp implements HealthNationalService {
+    public class HealthNationalServiceImp implements HealthNationalService {
 
         private List<ProductSpecification> prodList;
 
@@ -81,7 +82,10 @@ public class ConsultationTerminalTest {
         }
 
         @Override
-        public ProductSpecification getProductSpecification(int opt) {
+        public ProductSpecification getProductSpecification(int opt) throws AnyMedicineSearchException {
+            if (opt == 3) {
+                throw new AnyMedicineSearchException("Not valid option.");
+            }
             return ps1;
         }
 
@@ -93,7 +97,7 @@ public class ConsultationTerminalTest {
         }
     }
 
-    public static class ScheduledVisitAgendaImpl implements ScheduledVisitAgenda {
+    public class ScheduledVisitAgendaImpl implements ScheduledVisitAgenda {
 
         @Override
         public HealthCardID getHealthCardID() throws HealthCardException {
@@ -101,8 +105,8 @@ public class ConsultationTerminalTest {
         }
     }
 
-    @BeforeAll
-    static void setup(){
+    @BeforeEach
+    void setup(){
         consultationTerminal = new ConsultationTerminal();
         consultationTerminal.setHealthNationalService(new HealthNationalServiceImp());
         consultationTerminal.setScheduledVisitAgenda(new ScheduledVisitAgendaImpl());
@@ -112,7 +116,6 @@ public class ConsultationTerminalTest {
     @Test
     void initRevisionTest() throws NotValidePrescription, HealthCardException, ConnectException {
         consultationTerminal.initRevision();
-
         int prescCode = consultationTerminal.getMedicalPrescription().getPrescCode();
         HealthCardID hcID = consultationTerminal.getHcID();
 
@@ -122,8 +125,8 @@ public class ConsultationTerminalTest {
 
     @Test
     void initPrescriptionEditionBeforeInitRevisionTest() {
-        ConsultationTerminal ct = new ConsultationTerminal();
-        assertThrows(AnyCurrentPrescriptionException.class, () -> ct.initPrescriptionEdition());
+        assertThrows(AnyCurrentPrescriptionException.class,
+                () -> consultationTerminal.initPrescriptionEdition());
     }
 
 
@@ -142,7 +145,6 @@ public class ConsultationTerminalTest {
         List<ProductSpecification> expectedList = new ArrayList<>();
         expectedList.add(ps1);
         expectedList.add(ps2);
-
         assertEquals(expectedList, consultationTerminal.getPsSearchResults());
     }
 
@@ -157,6 +159,13 @@ public class ConsultationTerminalTest {
         consultationTerminal.searchForProducts(validKeyWord);
         consultationTerminal.selectProduct(1);
         assertEquals(ps1, consultationTerminal.getPs());
+    }
+
+    @Test
+    void selectProductOutOfRangeTest() throws ConnectException, InvalidProductID, AnyKeyWordMedicineException {
+        consultationTerminal.searchForProducts(validKeyWord);
+        assertThrows(AnyMedicineSearchException.class,
+                () -> consultationTerminal.selectProduct(3));
     }
 
 }
